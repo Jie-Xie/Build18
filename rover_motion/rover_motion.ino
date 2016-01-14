@@ -1,9 +1,6 @@
-/* This program controls 2 separate DC motors using an L298 dual H 
- * bridge motor driver.
- * This program includes the following helper functions:
- * forward, backward, forward_left, forward_right, backward_left
- * backward_right, left, right, accel, decel, brake
- */
+
+String readString;
+String prevCommand = "";
 
 #define ENA    10
 #define IN1    9
@@ -11,24 +8,31 @@
 #define ENB    5
 #define IN3    6
 #define IN4    7
-#define CRUISE 80
+#define CRUISE 90
 #define ACCEL  10
 #define BRAKE  30
 #define MAX    100
 
-String message;
+#define FORWARDLEFT   "a"
+#define FORWARD       "b"
+#define FORWARDRIGHT  "c"
+#define LEFT          "d"
+#define RIGHT         "e"
+#define BACKLEFT      "f"
+#define BACK          "g"
+#define BACKRIGHT     "h"
 
-void setup() 
+void setup()
 {
-  Serial1.begin(9600); //set baud rate
-  Serial.begin(9600);
   pinMode(ENA, OUTPUT);
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
   pinMode(ENB, OUTPUT);
   pinMode(IN3, OUTPUT);
   pinMode(IN4, OUTPUT);
+  Serial1.begin(9600); //set baud rate
 }
+
 
 void clockwise(int in1, int in2)
 {
@@ -104,18 +108,18 @@ void left()
 {
   int speed = map(CRUISE, 0, 100, 0, 255);
   analogWrite(ENA, speed);
-  counterclockwise(IN1, IN2);
+  clockwise(IN1, IN2);
   analogWrite(ENB, speed);
-  clockwise(IN3, IN4);
+  counterclockwise(IN3, IN4);
 }
 
 void right()
 {
   int speed = map(CRUISE, 0, 100, 0, 255);
   analogWrite(ENA, speed);
-  clockwise(IN1, IN2);
+  counterclockwise(IN1, IN2);
   analogWrite(ENB, speed);
-  counterclockwise(IN3, IN4);
+  clockwise(IN3, IN4);
 }
 
 void decel()
@@ -134,32 +138,41 @@ void brake()
   digitalWrite(IN4, LOW);
 }
 
-void loop() 
-{
-  /* motion */
-//  forward();
-//  delay(1000);
-//  backward();
-//  delay(1000);
-//  left();
-//  delay(1000);
-//  right();
-//  delay(1000);
-//  forward_left();
-//  delay(1000);
-  /* bluetooth */
-  while(Serial1.available())
-  {//while there is data available on the serial monitor
-    message += char(Serial1.read());//store string from serial command
-  }
-  if(!Serial1.available())
-  {
-    if(message != "")
-    {//if data is available
-      if (Serial.available())
-        Serial.println(message); //show the data
-      message = ""; //clear the data
+void loop() {
+
+  //expect a string like wer,qwe rty,123 456,hyre kjhg,
+  //or like hello world,who are you?,bye!,
+  while (Serial1.available()) {
+    char c = Serial1.read();  //gets one byte from serial buffer
+    if (c == ' ') {
+      break;
+    }  //breaks out of captu v     re loop to print readstring
+    readString += c; 
+  } //makes the string readString  
+
+  if (readString.length() >0) {
+
+
+    if (readString != prevCommand) {
+      // call the control functions
+      if (readString == FORWARDLEFT) forward_left();
+      else if (readString == FORWARD) forward();
+      else if (readString == FORWARDRIGHT) forward_right();
+      else if (readString == LEFT) left();
+      else if (readString == RIGHT) right();
+      else if (readString == BACKLEFT) backward_left();
+      else if (readString == BACK) backward();
+      else if (readString == BACKRIGHT) backward_right();
+      prevCommand = readString;
     }
+
+    readString=""; //clears variable for new input
+    delay(500);
+    return;
   }
-  delay(5000); //delay
+  decel();
+  prevCommand = "";
+  delay(500);
 }
+
+
