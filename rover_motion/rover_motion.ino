@@ -8,7 +8,17 @@ String prevCommand = "";
 #define ENB    5
 #define IN3    6
 #define IN4    7
+<<<<<<< Updated upstream
 #define CRUISE 90
+=======
+#define EnA    2
+#define In1    28
+#define In2    26
+#define EnB    3
+#define In3    24
+#define In4    22
+#define CRUISE 80
+>>>>>>> Stashed changes
 #define ACCEL  10
 #define BRAKE  30
 #define MAX    100
@@ -30,7 +40,16 @@ void setup()
   pinMode(ENB, OUTPUT);
   pinMode(IN3, OUTPUT);
   pinMode(IN4, OUTPUT);
+<<<<<<< Updated upstream
   Serial1.begin(9600); //set baud rate
+=======
+  pinMode(EnA, OUTPUT);
+  pinMode(In1, OUTPUT);
+  pinMode(In2, OUTPUT);
+  pinMode(EnB, OUTPUT);
+  pinMode(In3, OUTPUT);
+  pinMode(In4, OUTPUT);
+>>>>>>> Stashed changes
 }
 
 
@@ -51,8 +70,12 @@ void forward()
   int speed = map(CRUISE, 0, 100, 0, 255);
   analogWrite(ENA, speed);
   clockwise(IN1, IN2);
+  analogWrite(EnA, speed);
+  clockwise(In1, In2);
   analogWrite(ENB, speed);
   clockwise(IN3, IN4);
+  analogWrite(EnB, speed);
+  clockwise(In3, In4);
 }
 
 void backward()
@@ -60,6 +83,7 @@ void backward()
   int speed = map(CRUISE, 0, 100, 0, 255);
   analogWrite(ENA, speed);
   counterclockwise(IN1, IN2);
+  
   analogWrite(ENB, speed);
   counterclockwise(IN3, IN4);
 }
@@ -138,6 +162,7 @@ void brake()
   digitalWrite(IN4, LOW);
 }
 
+<<<<<<< Updated upstream
 void loop() {
 
   //expect a string like wer,qwe rty,123 456,hyre kjhg,
@@ -173,6 +198,20 @@ void loop() {
   decel();
   prevCommand = "";
   delay(500);
+=======
+void loop() 
+{
+  forward();
+  delay(1000);
+//  backward();
+//  delay(1000);
+//  left();
+//  delay(1000);
+//  right();
+//  delay(1000);
+//  forward_left();
+//  delay(1000);
+>>>>>>> Stashed changes
 }
 
 
