@@ -2,14 +2,15 @@
 String readString;
 String prevCommand = "";
 
-#define FORWARDLEFT   "a"
-#define FORWARD       "b"
-#define FORWARDRIGHT  "c"
-#define LEFT          "d"
-#define RIGHT         "e"
-#define BACKLEFT      "f"
-#define BACK          "g"
-#define BACKRIGHT     "h"
+#define FORWARDLEFT   'a'
+#define FORWARD       'b'
+#define FORWARDRIGHT  'c'
+#define LEFT          'd'
+#define RIGHT         'e'
+#define BACKLEFT      'f'
+#define BACK          'g'
+#define BACKRIGHT     'h'
+#define STOP          's'
 
 
 // defines for motor control
@@ -26,25 +27,26 @@ String prevCommand = "";
 #define MAX    100
 
 // Defines for ultrasonic
-#define frLeft_R   22
-#define frRight_R  24
-#define frLeft2_R  26
-#define frRight2_R 28
-#define left_R     30
-#define right_R    32
-#define back_R     34
+#define frLeft_R   43
+#define frRight_R  51
+#define frLeft2_R  49
+#define frRight2_R 35
+#define left_R     27
+#define right_R    31
+#define back_R     25
 
-#define frLeft_T   23
-#define frRight_T  25
-#define frLeft2_T  27
-#define frRight2_T 29
-#define left_T     31
-#define right_T    33
-#define back_T     35
+#define frLeft_T   42
+#define frRight_T  50
+#define frLeft2_T  48
+#define frRight2_T 34
+#define left_T     26
+#define right_T    30
+#define back_T     24
 
 long dFL, dFR, dFL2, dFR2, dL, dR, dB;
-int safeDist = 15; //cm
-int followDist = 300; //cm 
+int safeDist = 6; //inch
+int followDist = 20; //inch
+int maxDist = 300;
  
 void setup() {
   //Serial Port begin
@@ -195,20 +197,23 @@ void loop()
     //makes the string readString  
     readString += c;
   }
+  Serial.println(readString);
 
   // if the user gives input, do what the input tells
   if (readString.length() >0) {
+    
 
     if (readString != prevCommand) {
       // call the control functions
-      if (readString == FORWARDLEFT) forward_left();
-      else if (readString == FORWARD) forward();
-      else if (readString == FORWARDRIGHT) forward_right();
-      else if (readString == LEFT) left();
-      else if (readString == RIGHT) right();
-      else if (readString == BACKLEFT) backward_left();
-      else if (readString == BACK) backward();
-      else if (readString == BACKRIGHT) backward_right();
+      if (readString.charAt(0) == FORWARDLEFT) forward_left();
+      else if (readString.charAt(0) == FORWARD) forward();
+      else if (readString.charAt(0) == FORWARDRIGHT) forward_right();
+      else if (readString.charAt(0) == LEFT) left();
+      else if (readString.charAt(0) == RIGHT) right();
+      else if (readString.charAt(0) == BACKLEFT) backward_left();
+      else if (readString.charAt(0) == BACK) backward();
+      else if (readString.charAt(0) == BACKRIGHT) backward_right();
+      else if (readString.charAt(0) == STOP) decel();
       prevCommand = readString;
     }
 
@@ -217,34 +222,70 @@ void loop()
     return;
   }
   else {
-    
     // calculate how far the nearest object is in front of 
     // each ultrasonic sensor
     dFL = calcDistance(frLeft_T, frLeft_R);
+    if (Serial1.available()) return;
     dFR = calcDistance(frRight_T, frRight_R);
+    if (Serial1.available()) return;
     dFL2 = calcDistance(frLeft2_T, frLeft2_R);
+    if (Serial1.available()) return;
     dFR2 = calcDistance(frRight2_T, frRight2_R);
-    dL = calcDistance(left_T, left_R);
-    dR = calcDistance(right_T, right_R);
-    dB = calcDistance(back_T, back_R);
-  
-    // if the people is in front of the car
-    if (dFL == dFR) {
-      if (dFL >= followDist) forward();
-      else decel();
-    }
-    else {
-      if (dFL < followDist && dFR < followDist) {
+    if (Serial1.available()) return;
+//    dL = calcDistance(left_T, left_R);
+//    if (Serial1.available()) return;
+//    dR = calcDistance(right_T, right_R);
+//    if (Serial1.available()) return;
+//    dB = calcDistance(back_T, back_R);
+//    if (Serial1.available()) return;
+
+    Serial1.print(dFL);
+    Serial1.print(" , ");
+    Serial1.print(dFR);
+    Serial1.print(" , ");
+    Serial1.print(dFL2);
+    Serial1.print(" , ");
+    Serial1.println(dFR2);
+
+    if (dFL != 0 && dFR != 0 && dFL < maxDist && dFR < maxDist) {
+      // if the people is in front of the car
+      if (abs(dFL - dFR) <= 4) {
+        if (dFL >= followDist) forward();
+        else decel();
+      }
+      else {
         if (dFL < dFR) left();
         else right();
       }
-      else {
-        if (dFL < dFR) forward_left();
-        else forward_right();
-      }
+      delay(500);
+      return;
     }
+
+    if (dFL == 0 || dFL > maxDist) dFL = maxDist;
+    if (dFR == 0 || dFR > maxDist) dFR = maxDist;
+    if (dFL2 == 0 || dFL2 > maxDist) dFL2 = maxDist;
+    if (dFR2 == 0 || dFR2 > maxDist) dFR2 = maxDist;
     
-    delay(500);
+    int forw = dFL + dFR;
+    int lef = dFL + dFL2;
+    int rig = dFR + dFR2;
+
+    // if left side has the minimum sum
+    if (lef < forw && lef < rig) {
+      left();
+      delay(500);
+      return;
+    }
+    // if right side has the minimum sum
+    else if (rig < forw && rig < lef) {
+      right();
+      delay(500);
+      return;
+    }
+    else {
+      
+      delay(500);
+    }
   }
 }
 
@@ -262,7 +303,7 @@ long calcDistance(int trigPin,int echoPin)
   // duration is the time (in microseconds) from the sending
   // of the ping to the reception of its echo off of an object.
   long duration = pulseIn(echoPin, HIGH);
-  long distance = (duration/2) / 29.1;
+  long distance = (duration/2) / 74;
 
   return distance;
 }
