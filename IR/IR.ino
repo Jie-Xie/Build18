@@ -23,10 +23,15 @@ void setup()
 
 void loop() {
   // LED transmits infared
+<<<<<<< Updated upstream
   irsend.sendSony(0xa90, 12); 
   irrecv.enableIRIn();
 //  irrecv.decode(&results);
 //  Serial.println(results.value, HEX);
+=======
+  irsend.sendSony(0xa90, 12);
+  irrecv.enableIRIn();
+>>>>>>> Stashed changes
   //receiver receives infared 
 //  if (irrecv.decode(&results)) {
 //    Serial.println(results.value, HEX);
