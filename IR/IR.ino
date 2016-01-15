@@ -24,10 +24,12 @@ void setup()
 void loop() {
   // LED transmits infared
   irsend.sendSony(0xa90, 12); 
+  irrecv.enableIRIn();
+//  irrecv.decode(&results);
+//  Serial.println(results.value, HEX);
   //receiver receives infared 
-  if (irrecv.decode(&results)) {
-    Serial.println(results.value, HEX);
-    irrecv.resume(); // Receive the next value
-  }
-  delay(1000);
+//  if (irrecv.decode(&results)) {
+//    Serial.println(results.value, HEX);
+//  }
+  delay(500);
 }

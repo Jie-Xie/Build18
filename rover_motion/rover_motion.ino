@@ -8,17 +8,14 @@ String prevCommand = "";
 #define ENB    5
 #define IN3    6
 #define IN4    7
-<<<<<<< Updated upstream
-#define CRUISE 90
-=======
-#define EnA    2
-#define In1    28
-#define In2    26
-#define EnB    3
-#define In3    24
-#define In4    22
-#define CRUISE 80
->>>>>>> Stashed changes
+//#define EnA    2
+//#define In1    28
+//#define In2    26
+//#define EnB    3
+//#define In3    24
+//#define In4    22
+
+#define CRUISE 100
 #define ACCEL  10
 #define BRAKE  30
 #define MAX    100
@@ -40,16 +37,15 @@ void setup()
   pinMode(ENB, OUTPUT);
   pinMode(IN3, OUTPUT);
   pinMode(IN4, OUTPUT);
-<<<<<<< Updated upstream
+
+//  pinMode(EnA, OUTPUT);
+//  pinMode(In1, OUTPUT);
+//  pinMode(In2, OUTPUT);
+//  pinMode(EnB, OUTPUT);
+//  pinMode(In3, OUTPUT);
+//  pinMode(In4, OUTPUT);
+  
   Serial1.begin(9600); //set baud rate
-=======
-  pinMode(EnA, OUTPUT);
-  pinMode(In1, OUTPUT);
-  pinMode(In2, OUTPUT);
-  pinMode(EnB, OUTPUT);
-  pinMode(In3, OUTPUT);
-  pinMode(In4, OUTPUT);
->>>>>>> Stashed changes
 }
 
 
@@ -70,12 +66,12 @@ void forward()
   int speed = map(CRUISE, 0, 100, 0, 255);
   analogWrite(ENA, speed);
   clockwise(IN1, IN2);
-  analogWrite(EnA, speed);
-  clockwise(In1, In2);
+//  analogWrite(EnA, speed);
+//  clockwise(In1, In2);
   analogWrite(ENB, speed);
   clockwise(IN3, IN4);
-  analogWrite(EnB, speed);
-  clockwise(In3, In4);
+//  analogWrite(EnB, speed);
+//  clockwise(In3, In4);
 }
 
 void backward()
@@ -91,7 +87,7 @@ void backward()
 void forward_left()
 {
   int left_speed = map(50, 0, 100, 0, 255);
-  int right_speed = map(90, 0, 100, 0, 255);
+  int right_speed = map(100, 0, 100, 0, 255);
   analogWrite(ENA, right_speed);
   clockwise(IN1, IN2);
   analogWrite(ENB, left_speed);
@@ -100,7 +96,7 @@ void forward_left()
 
 void forward_right()
 {
-  int left_speed = map(90, 0, 100, 0, 255);
+  int left_speed = map(100, 0, 100, 0, 255);
   int right_speed = map(50, 0, 100, 0, 255);
   analogWrite(ENA, right_speed);
   clockwise(IN1, IN2);
@@ -111,7 +107,7 @@ void forward_right()
 void backward_left()
 {
   int left_speed = map(50, 0, 100, 0, 255);
-  int right_speed = map(90, 0, 100, 0, 255);
+  int right_speed = map(100, 0, 100, 0, 255);
   analogWrite(ENA, right_speed);
   counterclockwise(IN1, IN2);
   analogWrite(ENB, left_speed);
@@ -120,7 +116,7 @@ void backward_left()
 
 void backward_right()
 {
-  int left_speed = map(90, 0, 100, 0, 255);
+  int left_speed = map(100, 0, 100, 0, 255);
   int right_speed = map(50, 0, 100, 0, 255);
   analogWrite(ENA, right_speed);
   counterclockwise(IN1, IN2);
@@ -162,56 +158,54 @@ void brake()
   digitalWrite(IN4, LOW);
 }
 
-<<<<<<< Updated upstream
-void loop() {
+//void loop() {
+//
+//  //expect a string like wer,qwe rty,123 456,hyre kjhg,
+//  //or like hello world,who are you?,bye!,
+//  while (Serial1.available()) {
+//    char c = Serial1.read();  //gets one byte from serial buffer
+//    if (c == ' ') {
+//      break;
+//    }  //breaks out of captu v     re loop to print readstring
+//    readString += c; 
+//  } //makes the string readString  
+//
+//  if (readString.length() >0) {
+//
+//
+//    if (readString != prevCommand) {
+//      // call the control functions
+//      if (readString == FORWARDLEFT) forward_left();
+//      else if (readString == FORWARD) forward();
+//      else if (readString == FORWARDRIGHT) forward_right();
+//      else if (readString == LEFT) left();
+//      else if (readString == RIGHT) right();
+//      else if (readString == BACKLEFT) backward_left();
+//      else if (readString == BACK) backward();
+//      else if (readString == BACKRIGHT) backward_right();
+//      prevCommand = readString;
+//    }
 
-  //expect a string like wer,qwe rty,123 456,hyre kjhg,
-  //or like hello world,who are you?,bye!,
-  while (Serial1.available()) {
-    char c = Serial1.read();  //gets one byte from serial buffer
-    if (c == ' ') {
-      break;
-    }  //breaks out of captu v     re loop to print readstring
-    readString += c; 
-  } //makes the string readString  
+//    readString=""; //clears variable for new input
+//    delay(500);
+//    return;
+//  }
+//  decel();
+//  prevCommand = "";
+//  delay(500);
 
-  if (readString.length() >0) {
-
-
-    if (readString != prevCommand) {
-      // call the control functions
-      if (readString == FORWARDLEFT) forward_left();
-      else if (readString == FORWARD) forward();
-      else if (readString == FORWARDRIGHT) forward_right();
-      else if (readString == LEFT) left();
-      else if (readString == RIGHT) right();
-      else if (readString == BACKLEFT) backward_left();
-      else if (readString == BACK) backward();
-      else if (readString == BACKRIGHT) backward_right();
-      prevCommand = readString;
-    }
-
-    readString=""; //clears variable for new input
-    delay(500);
-    return;
-  }
-  decel();
-  prevCommand = "";
-  delay(500);
-=======
 void loop() 
 {
-  forward();
-  delay(1000);
+//  forward();
+//  delay(1000);
 //  backward();
 //  delay(1000);
 //  left();
 //  delay(1000);
 //  right();
 //  delay(1000);
-//  forward_left();
-//  delay(1000);
->>>>>>> Stashed changes
+  forward_left();
+  delay(1000);
 }
 
 
